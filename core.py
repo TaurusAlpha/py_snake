@@ -20,6 +20,7 @@ class Core:
         self.display_bg = pygame.image.load("./assets/field_bg.jpg")
         self.display_bg = pygame.transform.scale(self.display_bg, self.grid.get_size())
         self.display_empty = pygame.Color(0, 0, 0, 0)
+        pygame.event.set_allowed([pygame.QUIT, pygame.KEYDOWN])
 
 
     def events(self, event) -> None:
@@ -58,6 +59,14 @@ class Core:
         pygame.quit()
 
 
+    def reset(self) -> None:
+        if self.snake.lives > 0:
+            self.snake.on_reset(self.grid.grid_block_size//2, self.grid.grid_block_size//2, self.snake.lives-1)
+            self.init_apple()
+        else:
+            self.running = False
+
+
     def run(self):
         self.running = True
         while self.running:
@@ -86,6 +95,6 @@ class Core:
 
 
     def check_collision(self) -> None:
-        if not (self.snake.position[0] in range(0, self.grid.grid_size)) \
-            or not (self.snake.position[1] in range(0, self.grid.grid_size)):
-            self.running = False
+        if not (self.snake.position.x in range(0, self.grid.grid_size + 1)) \
+            or not (self.snake.position.y in range(0, self.grid.grid_size +1)):
+            self.reset()

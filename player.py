@@ -1,9 +1,7 @@
 from enum import Enum
-from typing import List, Tuple
+from typing import Tuple
 
 import pygame
-
-from entity import Apple
 
 
 class Direction(Enum):
@@ -24,6 +22,7 @@ class Player:
         self.head_position = pygame.Vector2(posX, posY)
         self.player_segments = [PlayerSegment(self.head_position)]
         self.speed = 1
+        self.lives = 2
         self.direction = Direction.RIGHT
 
     
@@ -32,7 +31,7 @@ class Player:
         return self.head_position
 
 
-    def get_player_segments(self) -> List[PlayerSegment]:
+    def get_player_segments(self) -> Tuple[PlayerSegment]:
         return self.player_segments
 
 
@@ -49,6 +48,11 @@ class Player:
 
 
     def add_tail(self, segment: pygame.Vector2) -> None:
-        #self.player_segments.append(self.head_position)
         self.head_position = segment
         self.player_segments = [PlayerSegment(self.head_position)] + self.player_segments
+
+
+    def on_reset(self, posX: int, posY: int, live: int) -> None:
+        self.head_position = pygame.Vector2(posX, posY)
+        self.player_segments = [PlayerSegment(self.head_position)]
+        self.lives = live
