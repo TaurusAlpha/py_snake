@@ -1,7 +1,7 @@
 import pygame
 
 from entity import Apple
-from player import Player
+from player import Player, PlayerSegment
 
 
 class Grid(pygame.surface.Surface):
@@ -17,5 +17,5 @@ class Grid(pygame.surface.Surface):
             self.fill(snake.color, self.position_to_rect(segment.segment_position))
 
 
-    def position_to_rect(self, pos) -> pygame.rect.Rect:
-        return pygame.rect.Rect(pos[0]*self.grid_block_size, pos[1]*self.grid_block_size, self.grid_block_size, self.grid_block_size)
+    def position_to_rect(self, pos: pygame.Vector2) -> pygame.rect.Rect:
+        return pygame.rect.Rect(pos.x*self.grid_block_size, pos.y*self.grid_block_size, self.grid_block_size, self.grid_block_size)

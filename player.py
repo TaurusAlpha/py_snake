@@ -1,5 +1,5 @@
 from enum import Enum
-from typing import Tuple
+from typing import List, Tuple
 
 import pygame
 
@@ -32,13 +32,15 @@ class Player:
         return self.head_position
 
 
-    def get_player_segments(self) -> Tuple[PlayerSegment]:
-        return tuple(self.player_segments)
+    def get_player_segments(self) -> List[PlayerSegment]:
+        return self.player_segments
 
 
     def move(self) -> None:
-        for segment in self.player_segments:
-            segment.segment_position += self.direction.value
+        last_segment = self.player_segments.pop().segment_position
+        last_segment = self.head_position + self.direction.value
+        self.head_position = last_segment
+        self.player_segments = [PlayerSegment(self.head_position)] + self.player_segments
 
 
     def set_direction(self, direction: Direction) -> None:
