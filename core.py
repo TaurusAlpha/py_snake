@@ -2,6 +2,7 @@ from random import randint
 import pygame
 from entity import Apple
 from grid import Grid
+from hud import UserInterface
 from player import Direction, Player
 
 
@@ -11,7 +12,7 @@ class Core:
         self.running = False
         self.grid = Grid(30, 30)
         self.snake = Player(self.grid.grid_block_size//2, self.grid.grid_block_size//2)
-        self.apple = Apple(16, 15)
+        self.apple = Apple(10,10)
         self.display = pygame.display
         self.display_surface = self.display.set_mode(self.grid.get_size() , pygame.HWSURFACE | pygame.DOUBLEBUF )
         self.display.set_caption("PySnake_v2")
@@ -20,6 +21,7 @@ class Core:
         self.display_bg = pygame.image.load("./assets/field_bg.jpg")
         self.display_bg = pygame.transform.scale(self.display_bg, self.grid.get_size())
         self.display_empty = pygame.Color(0, 0, 0, 0)
+        self.user_hud = UserInterface()
         pygame.event.set_allowed([pygame.QUIT, pygame.KEYDOWN])
 
 
@@ -45,6 +47,8 @@ class Core:
         self.grid.draw_grid(self.snake, self.apple)
         self.display_surface.blit(self.display_bg, (0,0))
         self.display_surface.blit(self.grid, (0,0))
+        self.display_surface.blit(self.user_hud.hud_message("Lives: " + str(self.snake.lives)), (100, 30))
+        self.display_surface.blit(self.user_hud.hud_message("Score: " + str(self.snake.score)), (600, 30))
         self.display.update()
 
 
@@ -69,6 +73,7 @@ class Core:
 
     def run(self):
         self.running = True
+        
         while self.running:
             #Process keyboard events
             for event in pygame.event.get():
@@ -91,6 +96,7 @@ class Core:
     def check_apple_collision(self) -> None:
         if self.apple.position == (self.snake.position + self.snake.direction.value):
             self.snake.add_tail(self.apple.position)
+            self.snake.score += 1
             self.init_apple()
 
 

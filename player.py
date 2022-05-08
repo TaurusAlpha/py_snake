@@ -23,6 +23,7 @@ class Player:
         self.player_segments = [PlayerSegment(self.head_position)]
         self.speed = 1
         self.lives = 2
+        self.score = 0
         self.direction = Direction.RIGHT
 
     
@@ -56,3 +57,4 @@ class Player:
         self.head_position = pygame.Vector2(posX, posY)
         self.player_segments = [PlayerSegment(self.head_position)]
         self.lives = live
+        
