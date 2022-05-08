@@ -1,4 +1,5 @@
 from random import randint
+from time import sleep
 import pygame
 from entity import Apple
 from grid import Grid
@@ -16,7 +17,7 @@ class Core:
         self.display = pygame.display
         self.display_surface = self.display.set_mode(self.grid.get_size() , pygame.HWSURFACE | pygame.DOUBLEBUF )
         self.display.set_caption("PySnake_v2")
-        self.fps = 10
+        self.fps = 60
         self.clock = pygame.time.Clock()
         self.display_bg = pygame.image.load("./assets/field_bg.jpg")
         self.display_bg = pygame.transform.scale(self.display_bg, self.grid.get_size())
@@ -25,6 +26,8 @@ class Core:
         pygame.event.set_allowed([pygame.QUIT, pygame.KEYDOWN])
         self.start_ticks=pygame.time.get_ticks()
         self.timer = 0
+        self.elapsed_time = 0
+        self.update_interval = 300
 
 
     def events(self, event) -> None:
@@ -49,18 +52,18 @@ class Core:
         self.grid.draw_grid(self.snake, self.apple)
         self.display_surface.blit(self.display_bg, (0,0))
         self.display_surface.blit(self.grid, (0,0))
-        self.display_surface.blit(self.user_hud.hud_message("Lives: " + str(self.snake.lives)), (100, 30))
-        self.display_surface.blit(self.user_hud.hud_message("Score: " + str(self.snake.score)), (600, 30))
-        self.display_surface.blit(self.user_hud.hud_message("Timer: %.2f" % self.timer), (350, 30))
+        self.display_surface.blit(self.user_hud.hud_message("Lives: " + str(self.snake.lives)), (100, 20))
+        self.display_surface.blit(self.user_hud.hud_message("Score: " + str(self.snake.score)), (600, 20))
+        # self.display_surface.blit(self.user_hud.hud_message("Timer: %.2f" % self.timer), (350, 20))
         self.display.update()
 
 
-    def update(self) -> None:
+    def update(self, delta_time: int) -> None:
         self.check_apple_collision()
         self.check_collision()
-        self.snake.move()
+        self.snake.move(delta_time)
         self.timer=(pygame.time.get_ticks()-self.start_ticks)/1000
-        self.clock.tick(self.fps)
+        # self.clock.tick(self.fps)
     
     
     def on_cleanup(self) -> None:
@@ -77,15 +80,14 @@ class Core:
 
     def run(self):
         self.running = True
-        
+
         while self.running:
-            #Process keyboard events
+            #Process keyboard events 
+            delta_time = self.clock.tick(self.fps)
             for event in pygame.event.get():
                 self.events(event)
-            
             #Update logic
-            self.update()
-
+            self.update(delta_time)
             #Render/Draw
             self.render()
         #Clean stuff after quit
@@ -97,6 +99,8 @@ class Core:
         for segment in self.snake.get_player_segments():
             if self.apple.apple_position == segment.segment_position:
                 self.init_apple()
+        if self.snake.score % 5 == 0:
+            self.snake.speed -= 20
 
 
     def check_apple_collision(self) -> None:
@@ -108,7 +112,7 @@ class Core:
 
     def check_collision(self) -> None:
         if not (self.snake.position.x in range(0, self.grid.grid_size + 1)) \
-            or not (self.snake.position.y in range(0, self.grid.grid_size +1)):
+            or not (self.snake.position.y in range(0, self.grid.grid_size + 1)):
             self.reset()
         if len(self.snake.get_player_segments()) > 4:
             for segment in self.snake.player_segments[3:]:

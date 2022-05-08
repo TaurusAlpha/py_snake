@@ -21,10 +21,11 @@ class Player:
         self.color = (45,86,191)
         self.head_position = pygame.Vector2(posX, posY)
         self.player_segments = [PlayerSegment(self.head_position)]
-        self.speed = 1
+        self.speed = 300
         self.lives = 2
         self.score = 0
         self.direction = Direction.RIGHT
+        self.speed_accum = 0
 
     
     @property
@@ -36,11 +37,14 @@ class Player:
         return self.player_segments
 
 
-    def move(self) -> None:
-        last_segment = self.player_segments.pop().segment_position
-        last_segment = self.head_position + self.direction.value
-        self.head_position = last_segment
-        self.player_segments = [PlayerSegment(self.head_position)] + self.player_segments
+    def move(self, delta_time: int) -> None:
+        self.speed_accum += delta_time
+        if self.speed_accum >= self.speed:
+            last_segment = self.player_segments.pop().segment_position
+            last_segment = self.head_position + self.direction.value
+            self.head_position = last_segment
+            self.player_segments = [PlayerSegment(self.head_position)] + self.player_segments
+            self.speed_accum -= self.speed
 
 
     def set_direction(self, direction: Direction) -> None:
