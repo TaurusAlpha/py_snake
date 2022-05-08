@@ -23,6 +23,8 @@ class Core:
         self.display_empty = pygame.Color(0, 0, 0, 0)
         self.user_hud = UserInterface()
         pygame.event.set_allowed([pygame.QUIT, pygame.KEYDOWN])
+        self.start_ticks=pygame.time.get_ticks()
+        self.timer = 0
 
 
     def events(self, event) -> None:
@@ -49,6 +51,7 @@ class Core:
         self.display_surface.blit(self.grid, (0,0))
         self.display_surface.blit(self.user_hud.hud_message("Lives: " + str(self.snake.lives)), (100, 30))
         self.display_surface.blit(self.user_hud.hud_message("Score: " + str(self.snake.score)), (600, 30))
+        self.display_surface.blit(self.user_hud.hud_message("Timer: %.2f" % self.timer), (350, 30))
         self.display.update()
 
 
@@ -56,6 +59,7 @@ class Core:
         self.check_apple_collision()
         self.check_collision()
         self.snake.move()
+        self.timer=(pygame.time.get_ticks()-self.start_ticks)/1000
         self.clock.tick(self.fps)
     
     
@@ -90,7 +94,9 @@ class Core:
 
     def init_apple(self):
         self.apple = Apple(randint(0, self.grid.grid_size), randint(0, self.grid.grid_size))
-        #print(self.apple.position)
+        for segment in self.snake.get_player_segments():
+            if self.apple.apple_position == segment.segment_position:
+                self.init_apple()
 
 
     def check_apple_collision(self) -> None:
@@ -104,3 +110,7 @@ class Core:
         if not (self.snake.position.x in range(0, self.grid.grid_size + 1)) \
             or not (self.snake.position.y in range(0, self.grid.grid_size +1)):
             self.reset()
+        if len(self.snake.get_player_segments()) > 4:
+            for segment in self.snake.player_segments[3:]:
+                if self.snake.position == segment.segment_position:
+                    self.reset()
